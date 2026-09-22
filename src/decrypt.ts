@@ -83,7 +83,7 @@ async function getSopsEncryptionKey(
   for (const secretKey of secretKeys) {
     try {
       const pubKey = await getPublicAgeKey(secretKey);
-      const recipient = sops.sops.age.find(
+      const recipient = (sops.sops.age ?? []).find(
         (config) => config.recipient === pubKey,
       );
 
@@ -191,6 +191,15 @@ export interface DecryptOptions {
    * If not specified, all available keys will be discovered and tried.
    */
   secretKey?: string;
+
+  /**
+   * An already-unwrapped SOPS data key (32 bytes). Use this when the file's
+   * data key is protected by a master key other than age — for example
+   * `sops.kms[].enc` unwrapped with `kms:Decrypt` — and only the value
+   * decryption (AES-256-GCM with path-bound additional data) is needed.
+   * When set, no age keys are looked up and `secretKey` is ignored.
+   */
+  dataKey?: Uint8Array;
 }
 
 /**
@@ -211,7 +220,35 @@ export interface DecryptOptions {
  * @returns The decrypted value (if keyPath provided) or object with all values decrypted
  */
 export async function decrypt(sops: SOPS, options: DecryptOptions) {
-  const { keyPath, secretKey } = options;
+  const { keyPath, secretKey, dataKey } = options;
+
+  const decryptionKey = dataKey
+    ? validateDataKey(dataKey)
+    : await getSopsEncryptionKeyFromAge(sops, secretKey);
+
+  return decryptWithDataKey(sops, decryptionKey, keyPath);
+}
+
+function validateDataKey(dataKey: Uint8Array): Uint8Array {
+  if (dataKey.length !== 32) {
+    throw new Error(
+      `Invalid dataKey: expected 32 bytes (AES-256), got ${dataKey.length}`,
+    );
+  }
+  return dataKey;
+}
+
+async function getSopsEncryptionKeyFromAge(
+  sops: SOPS,
+  secretKey: string | undefined,
+): Promise<Uint8Array> {
+  if (!sops.sops.age || sops.sops.age.length === 0) {
+    throw new Error(
+      "This SOPS file has no age recipients. Unwrap its data key with the " +
+        "master key it is encrypted to (e.g. kms:Decrypt of sops.kms[].enc) " +
+        "and pass it as the dataKey option.",
+    );
+  }
 
   // Determine which secret keys to use
   let secretKeys: string[];
@@ -239,8 +276,14 @@ export async function decrypt(sops: SOPS, options: DecryptOptions) {
   }
 
   // Try to decrypt the SOPS encryption key with available secret keys
-  const decryptionKey = await getSopsEncryptionKey(sops, secretKeys);
+  return getSopsEncryptionKey(sops, secretKeys);
+}
 
+function decryptWithDataKey(
+  sops: SOPS,
+  decryptionKey: Uint8Array,
+  keyPath: string | undefined,
+) {
   // If we have a path to a specific key, only decrypt that
   if (keyPath) {
     const value = get(sops, keyPath);

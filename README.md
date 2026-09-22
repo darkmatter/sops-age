@@ -334,3 +334,23 @@ const ageKey = await sshKeyFileToAge("~/.ssh/id_ed25519");
 ## License
 
 `sops-age` is released under the MIT License. See the [LICENSE](./LICENSE.md) file for more details.
+
+## Files encrypted to other master keys (AWS KMS, …)
+
+`sops-age` only unwraps the SOPS data key with **age**. If a file is encrypted
+to another master key, unwrap the data key yourself and hand it over with
+`dataKey`; the value decryption (AES-256-GCM with SOPS's path-bound additional
+data) is the same for every master key:
+
+```ts
+import { decryptSops } from "sops-age";
+
+// e.g. kms:Decrypt of sops.kms[0].enc → 32-byte data key
+const dataKey: Uint8Array = await unwrapWithKms(encrypted.sops.kms[0]);
+
+const secrets = await decryptSops(encryptedJson, { dataKey, fileType: "json" });
+```
+
+When `dataKey` is set, no age keys are looked up and `secretKey` is ignored.
+Files with `"age": null` (no age recipients at all) parse fine and require
+`dataKey`.

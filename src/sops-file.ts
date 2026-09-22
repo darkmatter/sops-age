@@ -39,7 +39,8 @@ export function isSopsInput(value: unknown): value is SopsInput {
     "sops" in value &&
     typeof (value as any).sops === "object" &&
     (value as any).sops !== null &&
-    Array.isArray((value as any).sops.age) &&
+    ((value as any).sops.age == null ||
+      Array.isArray((value as any).sops.age)) &&
     typeof (value as any).sops.mac === "string" &&
     typeof (value as any).sops.lastmodified === "string" &&
     typeof (value as any).sops.version === "string"
@@ -70,8 +71,9 @@ const AgeRecipientSchema = z.object({
 const SopsSchema = z
   .object({
     sops: z.object({
-      // We only care about age recipients
-      age: z.array(AgeRecipientSchema),
+      // age recipients; absent (null) when the file is encrypted only to
+      // other master keys (e.g. AWS KMS) — decrypt those with `dataKey`.
+      age: z.array(AgeRecipientSchema).nullable().optional(),
       lastmodified: z.string(),
       mac: z.string().optional(),
       unencrypted_suffix: z.string().optional(),
