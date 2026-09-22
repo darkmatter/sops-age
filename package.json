@@ -1,8 +1,15 @@
 {
-  "name": "sops-age",
-  "version": "4.0.2",
-  "description": "sops age decryption for JavaScript",
-  "repository": "humphd/sops-age",
+  "name": "@darkmatter/sops-age",
+  "version": "4.1.0",
+  "description": "sops age decryption for JavaScript — darkmatter fork with the dataKey option for KMS-encrypted files",
+  "homepage": "https://github.com/darkmatter/sops-age#readme",
+  "bugs": {
+    "url": "https://github.com/darkmatter/sops-age/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/darkmatter/sops-age.git"
+  },
   "license": "MIT",
   "author": {
     "name": "David Humphrey"
@@ -87,8 +94,12 @@
     "vitest": "^3.1.4",
     "vitest-environment-miniflare": "^2.14.4"
   },
-  "packageManager": "pnpm@9",
   "engines": {
     "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org"
   }
 }

@@ -1,3 +1,6 @@
+> **darkmatter fork** of [humphd/sops-age](https://github.com/humphd/sops-age), published as `@darkmatter/sops-age`.
+> Adds the `dataKey` option (decrypt files whose data key you unwrapped yourself, e.g. via AWS KMS) and accepts files with no age recipients. Offered upstream as [humphd/sops-age#22](https://github.com/humphd/sops-age/pull/22); this fork exists because upstream has been quiet for a year. Everything else is unchanged.
+
 # sops-age
 
 `sops-age` is a TypeScript library designed to decrypt files encrypted with [SOPS](https://github.com/getsops/sops) (Secrets OPerationS) and the [age](https://github.com/FiloSottile/age) encryption tool. This library provides an easy way to decrypt environment variables, configuration files, and other sensitive data encrypted with SOPS and age in your applications. It works in most JavaScript runtimes (node.js, the browser, Deno, Bun, etc).
