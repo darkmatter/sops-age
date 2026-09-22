@@ -1,5 +1,5 @@
 {
-  "name": "@darkmatter/sops-age",
+  "name": "@drkmttr/sops-age",
   "version": "4.1.0",
   "description": "sops age decryption for JavaScript — darkmatter fork with the dataKey option for KMS-encrypted files",
   "homepage": "https://github.com/darkmatter/sops-age#readme",

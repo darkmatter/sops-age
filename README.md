@@ -1,4 +1,4 @@
-> **darkmatter fork** of [humphd/sops-age](https://github.com/humphd/sops-age), published as `@darkmatter/sops-age`.
+> **darkmatter fork** of [humphd/sops-age](https://github.com/humphd/sops-age), published as `@drkmttr/sops-age`.
 > Adds the `dataKey` option (decrypt files whose data key you unwrapped yourself, e.g. via AWS KMS) and accepts files with no age recipients. Offered upstream as [humphd/sops-age#22](https://github.com/humphd/sops-age/pull/22); this fork exists because upstream has been quiet for a year. Everything else is unchanged.
 
 # sops-age
